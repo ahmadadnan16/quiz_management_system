@@ -1,7 +1,13 @@
-<h1>Edit Question</h1>
-<p class="text-muted">Quiz: <%= @quiz.title %></p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1>Edit Question</h1>
+    <p class="text-muted">Quiz: <%= @quiz.title %></p>
+  </div>
+  <% if @question.mcq? %>
+    <%= link_to 'Manage Options', admin_quiz_question_options_path(@quiz, @question), class: 'btn btn-info' %>
+  <% end %>
+</div>
 
 <%= render 'form', quiz: @quiz, question: @question %>
 
 <%= link_to 'Back', admin_quiz_questions_path(@quiz), class: 'btn btn-secondary mt-3' %>
-

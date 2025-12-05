@@ -43,7 +43,7 @@ class Admin::OptionsController < Admin::BaseController
   private
   
   def set_quiz
-    @quiz = Quiz.find(params[:quiz_id])
+    @quiz = Quiz.find_by!(slug: params[:quiz_id])
   end
   
   def set_question

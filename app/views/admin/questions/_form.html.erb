@@ -23,7 +23,18 @@
           ['True/False', 'true_false'],
           ['Text Answer', 'text']
         ], @question.question_type),
-        {}, { class: 'form-select', required: true } %>
+        {}, { class: 'form-select', required: true, id: 'question_question_type' } %>
+  </div>
+
+  <div class="mb-3" id="mcq-options-notice" style="<%= 'display: none;' unless @question.mcq? %>">
+    <div class="alert alert-info">
+      <strong>Note:</strong> For MCQ questions, you'll need to add options after saving this question. 
+      <% if @question.persisted? %>
+        <%= link_to 'Manage Options', admin_quiz_question_options_path(@quiz, @question), class: 'btn btn-sm btn-info' %>
+      <% else %>
+        Save this question first, then click "Manage Options" to add answer choices.
+      <% end %>
+    </div>
   </div>
 
   <div class="mb-3">
@@ -38,17 +49,22 @@
 
   <div class="mb-3" id="correct-answer-field" style="<%= 'display: none;' unless @question.true_false? || @question.text? %>">
     <%= form.label :correct_answer, class: 'form-label' %>
-    <% if @question.true_false? %>
-      <%= form.select :correct_answer, 
-          options_for_select([
-            ['True', 'true'],
-            ['False', 'false']
-          ], @question.correct_answer),
-          {}, { class: 'form-select' } %>
-    <% else %>
-      <%= form.text_field :correct_answer, class: 'form-control', 
-          placeholder: 'Reference answer (not auto-graded)' %>
-    <% end %>
+    <div id="correct-answer-container">
+      <% if @question.true_false? %>
+        <%= form.select :correct_answer, 
+            options_for_select([
+              ['True', 'true'],
+              ['False', 'false']
+            ], @question.correct_answer),
+            {}, { class: 'form-select', id: 'question_correct_answer' } %>
+      <% elsif @question.text? %>
+        <%= form.text_field :correct_answer, class: 'form-control', id: 'question_correct_answer',
+            placeholder: 'Reference answer (not auto-graded)' %>
+      <% else %>
+        <%= form.text_field :correct_answer, class: 'form-control', id: 'question_correct_answer',
+            placeholder: 'Reference answer (not auto-graded)', style: 'display: none;' %>
+      <% end %>
+    </div>
   </div>
 
   <div class="mb-3">
@@ -59,44 +75,72 @@
 
   <div class="actions">
     <%= form.submit class: 'btn btn-primary' %>
+    <%= link_to 'Cancel', admin_quiz_questions_path(@quiz), class: 'btn btn-secondary' %>
   </div>
 <% end %>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const questionTypeSelect = document.querySelector('#question_question_type');
+    const questionTypeSelect = document.getElementById('question_question_type');
     const correctAnswerField = document.getElementById('correct-answer-field');
-    const correctAnswerInput = document.querySelector('#question_correct_answer');
+    const correctAnswerContainer = document.getElementById('correct-answer-container');
+    const mcqNotice = document.getElementById('mcq-options-notice');
+    
+    if (!questionTypeSelect) return;
     
     function updateCorrectAnswerField() {
       const questionType = questionTypeSelect.value;
-      if (questionType === 'true_false') {
+      const currentInput = document.getElementById('question_correct_answer');
+      
+      if (questionType === 'mcq') {
+        // Hide correct answer field for MCQ
+        correctAnswerField.style.display = 'none';
+        // Show MCQ options notice
+        if (mcqNotice) mcqNotice.style.display = 'block';
+      } else if (questionType === 'true_false') {
+        // Show correct answer field with select for True/False
         correctAnswerField.style.display = 'block';
-        if (correctAnswerInput.tagName === 'INPUT') {
+        if (mcqNotice) mcqNotice.style.display = 'none';
+        
+        // Replace with select if it's not already a select
+        if (!currentInput || currentInput.tagName !== 'SELECT') {
           const select = document.createElement('select');
           select.name = 'question[correct_answer]';
           select.id = 'question_correct_answer';
           select.className = 'form-select';
           select.innerHTML = '<option value="true">True</option><option value="false">False</option>';
-          correctAnswerInput.parentNode.replaceChild(select, correctAnswerInput);
+          if (currentInput) {
+            currentInput.parentNode.replaceChild(select, currentInput);
+          } else {
+            correctAnswerContainer.innerHTML = '<select name="question[correct_answer]" id="question_correct_answer" class="form-select"><option value="true">True</option><option value="false">False</option></select>';
+          }
         }
       } else if (questionType === 'text') {
+        // Show correct answer field with text input for Text
         correctAnswerField.style.display = 'block';
-        if (correctAnswerInput.tagName === 'SELECT') {
+        if (mcqNotice) mcqNotice.style.display = 'none';
+        
+        // Replace with text input if it's not already a text input
+        if (!currentInput || currentInput.tagName !== 'INPUT' || currentInput.type !== 'text') {
           const input = document.createElement('input');
           input.type = 'text';
           input.name = 'question[correct_answer]';
           input.id = 'question_correct_answer';
           input.className = 'form-control';
           input.placeholder = 'Reference answer (not auto-graded)';
-          correctAnswerInput.parentNode.replaceChild(input, correctAnswerInput);
+          if (currentInput) {
+            currentInput.parentNode.replaceChild(input, currentInput);
+          } else {
+            correctAnswerContainer.innerHTML = '<input type="text" name="question[correct_answer]" id="question_correct_answer" class="form-control" placeholder="Reference answer (not auto-graded)">';
+          }
         }
-      } else {
-        correctAnswerField.style.display = 'none';
       }
     }
     
+    // Call on page load to set initial state
+    updateCorrectAnswerField();
+    
+    // Listen for changes
     questionTypeSelect.addEventListener('change', updateCorrectAnswerField);
   });
 </script>
-

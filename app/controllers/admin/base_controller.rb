@@ -3,3 +3,4 @@ class Admin::BaseController < ApplicationController
                                password: ENV.fetch('ADMIN_PASSWORD', 'password')
 end
 
+

@@ -1,7 +1,14 @@
-<h1>Question Details</h1>
-<p class="text-muted">Quiz: <%= @quiz.title %></p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1>Question Details</h1>
+    <p class="text-muted">Quiz: <%= @quiz.title %></p>
+  </div>
+  <% if @question.mcq? %>
+    <%= link_to 'Manage Options', admin_quiz_question_options_path(@quiz, @question), class: 'btn btn-info' %>
+  <% end %>
+</div>
 
-<div class="card">
+<div class="card mb-3">
   <div class="card-body">
     <h5 class="card-title"><%= @question.prompt %></h5>
     <p><strong>Type:</strong> <%= @question.question_type.humanize %></p>
@@ -15,6 +22,29 @@
   </div>
 </div>
 
+<% if @question.mcq? %>
+  <div class="card">
+    <div class="card-header">
+      <h5>Options</h5>
+    </div>
+    <div class="card-body">
+      <% if @question.options.any? %>
+        <ul class="list-group">
+          <% @question.options.ordered.each do |option| %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <%= option.text %>
+              <% if option.is_correct? %>
+                <span class="badge bg-success">Correct</span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-muted">No options added yet.</p>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
 <%= link_to 'Edit', edit_admin_quiz_question_path(@quiz, @question), class: 'btn btn-warning mt-3' %>
 <%= link_to 'Back', admin_quiz_questions_path(@quiz), class: 'btn btn-secondary mt-3' %>
-

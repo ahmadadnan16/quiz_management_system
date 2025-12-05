@@ -26,10 +26,10 @@
           <% end %>
         </td>
         <td><%= quiz.questions.count %></td>
-        <td>
+        <td style="display: flex;" class="column-gap-1">
           <%= link_to 'View', admin_quiz_path(quiz), class: 'btn btn-sm btn-info' %>
           <%= link_to 'Edit', edit_admin_quiz_path(quiz), class: 'btn btn-sm btn-warning' %>
-          <%= link_to 'Delete', admin_quiz_path(quiz), method: :delete, 
+          <%= button_to 'Delete', admin_quiz_path(quiz), method: :delete, 
                       data: { confirm: 'Are you sure?' }, class: 'btn btn-sm btn-danger' %>
           <%= link_to 'Take Quiz', quiz_path(quiz), class: 'btn btn-sm btn-success', target: '_blank' if quiz.published? %>
         </td>
@@ -37,4 +37,5 @@
     <% end %>
   </tbody>
 </table>
+
 
