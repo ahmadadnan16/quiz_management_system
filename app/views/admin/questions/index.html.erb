@@ -1,0 +1,38 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1>Questions for: <%= @quiz.title %></h1>
+    <%= link_to 'Back to Quiz', admin_quiz_path(@quiz), class: 'btn btn-secondary' %>
+  </div>
+  <%= link_to 'New Question', new_admin_quiz_question_path(@quiz), class: 'btn btn-primary' %>
+</div>
+
+<% if @questions.any? %>
+  <div class="list-group">
+    <% @questions.each_with_index do |question, index| %>
+      <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <h5 class="mb-1">Question <%= index + 1 %>: <%= question.prompt %></h5>
+            <p class="mb-1">
+              <span class="badge bg-info"><%= question.question_type.humanize %></span>
+              <span class="badge bg-secondary"><%= question.points %> point<%= 's' if question.points != 1 %></span>
+            </p>
+          </div>
+          <div>
+            <%= link_to 'Edit', edit_admin_quiz_question_path(@quiz, question), class: 'btn btn-sm btn-warning' %>
+            <%= link_to 'Delete', admin_quiz_question_path(@quiz, question), method: :delete,
+                        data: { confirm: 'Are you sure?' }, class: 'btn btn-sm btn-danger' %>
+            <% if question.mcq? %>
+              <%= link_to 'Manage Options', admin_quiz_question_options_path(@quiz, question), class: 'btn btn-sm btn-info' %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="alert alert-info">
+    No questions yet. <%= link_to 'Add your first question', new_admin_quiz_question_path(@quiz) %>.
+  </div>
+<% end %>
+

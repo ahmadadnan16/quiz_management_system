@@ -1,0 +1,32 @@
+<%= form_with model: [@quiz, @question, @option], url: @option.persisted? ? admin_quiz_question_option_path(@quiz, @question, @option) : admin_quiz_question_options_path(@quiz, @question), local: true do |form| %>
+  <% if @option.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(@option.errors.count, "error") %> prohibited this option from being saved:</h4>
+      <ul>
+        <% @option.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :text, class: 'form-label' %>
+    <%= form.text_field :text, class: 'form-control', required: true %>
+  </div>
+
+  <div class="mb-3 form-check">
+    <%= form.check_box :is_correct, class: 'form-check-input' %>
+    <%= form.label :is_correct, 'This is the correct answer', class: 'form-check-label' %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :position, class: 'form-label' %>
+    <%= form.number_field :position, class: 'form-control', value: @option.position || 0, min: 0 %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class: 'btn btn-primary' %>
+  </div>
+<% end %>
+

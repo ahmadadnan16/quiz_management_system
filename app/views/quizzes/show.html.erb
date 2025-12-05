@@ -1,0 +1,63 @@
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <div class="card">
+      <div class="card-header">
+        <h1 class="mb-0"><%= @quiz.title %></h1>
+      </div>
+      <div class="card-body">
+        <% if @quiz.description.present? %>
+          <p class="text-muted mb-4"><%= @quiz.description %></p>
+        <% end %>
+        
+        <%= form_with url: submit_quiz_path(@quiz), local: true do |form| %>
+          <% @questions.each_with_index do |question, index| %>
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5 class="card-title">
+                  Question <%= index + 1 %> 
+                  <span class="badge bg-secondary"><%= question.points %> point<%= 's' if question.points != 1 %></span>
+                </h5>
+                <p class="card-text"><%= question.prompt %></p>
+                
+                <% if question.mcq? %>
+                  <div class="form-group">
+                    <% question.options.ordered.each do |option| %>
+                      <div class="form-check">
+                        <%= radio_button_tag "answers[#{question.id}][option_id]", option.id, false, 
+                            class: 'form-check-input', id: "option_#{option.id}", required: true %>
+                        <%= label_tag "option_#{option.id}", option.text, class: 'form-check-label' %>
+                      </div>
+                    <% end %>
+                  </div>
+                <% elsif question.true_false? %>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <%= radio_button_tag "answers[#{question.id}][response_text]", 'true', false,
+                          class: 'form-check-input', id: "question_#{question.id}_true", required: true %>
+                      <%= label_tag "question_#{question.id}_true", 'True', class: 'form-check-label' %>
+                    </div>
+                    <div class="form-check">
+                      <%= radio_button_tag "answers[#{question.id}][response_text]", 'false', false,
+                          class: 'form-check-input', id: "question_#{question.id}_false", required: true %>
+                      <%= label_tag "question_#{question.id}_false", 'False', class: 'form-check-label' %>
+                    </div>
+                  </div>
+                <% elsif question.text? %>
+                  <div class="form-group">
+                    <%= text_area_tag "answers[#{question.id}][response_text]", '', 
+                        class: 'form-control', rows: 3, required: true,
+                        placeholder: 'Enter your answer here...' %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+          
+          <div class="text-center">
+            <%= form.submit 'Submit Quiz', class: 'btn btn-primary btn-lg' %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

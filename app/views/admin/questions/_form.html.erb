@@ -1,0 +1,102 @@
+<%= form_with model: [@quiz, @question], url: @question.persisted? ? admin_quiz_question_path(@quiz, @question) : admin_quiz_questions_path(@quiz), local: true do |form| %>
+  <% if @question.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(@question.errors.count, "error") %> prohibited this question from being saved:</h4>
+      <ul>
+        <% @question.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :prompt, class: 'form-label' %>
+    <%= form.text_area :prompt, class: 'form-control', rows: 3, required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :question_type, class: 'form-label' %>
+    <%= form.select :question_type, 
+        options_for_select([
+          ['Multiple Choice (MCQ)', 'mcq'],
+          ['True/False', 'true_false'],
+          ['Text Answer', 'text']
+        ], @question.question_type),
+        {}, { class: 'form-select', required: true } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :points, class: 'form-label' %>
+    <%= form.number_field :points, class: 'form-control', value: @question.points || 1, min: 1, required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :position, class: 'form-label' %>
+    <%= form.number_field :position, class: 'form-control', value: @question.position || 0, min: 0 %>
+  </div>
+
+  <div class="mb-3" id="correct-answer-field" style="<%= 'display: none;' unless @question.true_false? || @question.text? %>">
+    <%= form.label :correct_answer, class: 'form-label' %>
+    <% if @question.true_false? %>
+      <%= form.select :correct_answer, 
+          options_for_select([
+            ['True', 'true'],
+            ['False', 'false']
+          ], @question.correct_answer),
+          {}, { class: 'form-select' } %>
+    <% else %>
+      <%= form.text_field :correct_answer, class: 'form-control', 
+          placeholder: 'Reference answer (not auto-graded)' %>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :explanation, class: 'form-label' %>
+    <%= form.text_area :explanation, class: 'form-control', rows: 2,
+        placeholder: 'Optional explanation shown after quiz completion' %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class: 'btn btn-primary' %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const questionTypeSelect = document.querySelector('#question_question_type');
+    const correctAnswerField = document.getElementById('correct-answer-field');
+    const correctAnswerInput = document.querySelector('#question_correct_answer');
+    
+    function updateCorrectAnswerField() {
+      const questionType = questionTypeSelect.value;
+      if (questionType === 'true_false') {
+        correctAnswerField.style.display = 'block';
+        if (correctAnswerInput.tagName === 'INPUT') {
+          const select = document.createElement('select');
+          select.name = 'question[correct_answer]';
+          select.id = 'question_correct_answer';
+          select.className = 'form-select';
+          select.innerHTML = '<option value="true">True</option><option value="false">False</option>';
+          correctAnswerInput.parentNode.replaceChild(select, correctAnswerInput);
+        }
+      } else if (questionType === 'text') {
+        correctAnswerField.style.display = 'block';
+        if (correctAnswerInput.tagName === 'SELECT') {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.name = 'question[correct_answer]';
+          input.id = 'question_correct_answer';
+          input.className = 'form-control';
+          input.placeholder = 'Reference answer (not auto-graded)';
+          correctAnswerInput.parentNode.replaceChild(input, correctAnswerInput);
+        }
+      } else {
+        correctAnswerField.style.display = 'none';
+      }
+    }
+    
+    questionTypeSelect.addEventListener('change', updateCorrectAnswerField);
+  });
+</script>
+

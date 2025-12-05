@@ -1,10 +1,19 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # Admin routes
+  namespace :admin do
+    resources :quizzes do
+      resources :questions do
+        resources :options
+      end
+    end
+  end
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Public routes
+  root 'quizzes#index'
+  get '/quizzes/:slug', to: 'quizzes#show', as: 'quiz'
+  post '/quizzes/:slug/submit', to: 'submissions#create', as: 'submit_quiz'
+  get '/quizzes/:slug/results/:submission_id', to: 'submissions#show', as: 'quiz_results'
+
+  # Health check
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Defines the root path route ("/")
-  # root "posts#index"
 end

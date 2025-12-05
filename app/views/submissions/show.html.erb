@@ -1,0 +1,82 @@
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h1 class="mb-0">Quiz Results</h1>
+      </div>
+      <div class="card-body">
+        <div class="text-center mb-4">
+          <h2>Your Score</h2>
+          <div class="display-4 fw-bold text-primary">
+            <%= @submission.score %> / <%= @submission.total_points %>
+          </div>
+          <div class="h4 text-muted">
+            <%= @submission.percentage %>% Correct
+          </div>
+        </div>
+        
+        <hr>
+        
+        <h3 class="mb-4">Question Review</h3>
+        
+        <% @questions.each_with_index do |question, index| %>
+          <% answer = @answers_by_question[question.id] %>
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">
+                Question <%= index + 1 %>: <%= question.prompt %>
+                <% if answer && answer.is_correct != nil %>
+                  <% if answer.is_correct? %>
+                    <span class="badge bg-success">Correct</span>
+                  <% else %>
+                    <span class="badge bg-danger">Incorrect</span>
+                  <% end %>
+                <% end %>
+              </h5>
+              
+              <% if question.mcq? %>
+                <p><strong>Your Answer:</strong> 
+                  <%= answer&.option&.text || 'No answer provided' %>
+                </p>
+                <% if answer && !answer.is_correct? %>
+                  <p class="text-success"><strong>Correct Answer:</strong> 
+                    <%= question.options.find_by(is_correct: true)&.text %>
+                  </p>
+                <% end %>
+              <% elsif question.true_false? %>
+                <p><strong>Your Answer:</strong> 
+                  <%= answer&.response_text&.capitalize || 'No answer provided' %>
+                </p>
+                <% if answer && !answer.is_correct? %>
+                  <p class="text-success"><strong>Correct Answer:</strong> 
+                    <%= question.correct_answer.capitalize %>
+                  </p>
+                <% end %>
+              <% elsif question.text? %>
+                <p><strong>Your Answer:</strong> 
+                  <%= answer&.response_text || 'No answer provided' %>
+                </p>
+                <% if question.correct_answer.present? %>
+                  <p class="text-muted"><strong>Reference Answer:</strong> 
+                    <%= question.correct_answer %>
+                    <small>(Text answers are not auto-graded)</small>
+                  </p>
+                <% end %>
+              <% end %>
+              
+              <% if question.explanation.present? %>
+                <div class="alert alert-info mt-2">
+                  <strong>Explanation:</strong> <%= question.explanation %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        
+        <div class="text-center mt-4">
+          <%= link_to 'Take Another Quiz', root_path, class: 'btn btn-primary' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

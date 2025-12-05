@@ -1,0 +1,7 @@
+<h1>Edit Option</h1>
+<p class="text-muted">Question: <%= @question.prompt %></p>
+
+<%= render 'form', quiz: @quiz, question: @question, option: @option %>
+
+<%= link_to 'Back', admin_quiz_question_options_path(@quiz, @question), class: 'btn btn-secondary mt-3' %>
+

@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  submission: one
+  question: one
+  option: one
+  response_text: MyString
+  is_correct: false
+
+two:
+  submission: two
+  question: two
+  option: two
+  response_text: MyString
+  is_correct: false

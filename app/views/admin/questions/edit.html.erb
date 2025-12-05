@@ -1,0 +1,7 @@
+<h1>Edit Question</h1>
+<p class="text-muted">Quiz: <%= @quiz.title %></p>
+
+<%= render 'form', quiz: @quiz, question: @question %>
+
+<%= link_to 'Back', admin_quiz_questions_path(@quiz), class: 'btn btn-secondary mt-3' %>
+
