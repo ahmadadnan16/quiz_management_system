@@ -1,5 +1,3 @@
-Here’s an approach you can drop into `PLAN.md` (tweak wording as you like):
-
 - **Assumptions**
   - Single Rails app (frontend + backend) with server-rendered HTML; no JS frameworks.
   - Authenticated “admin” experience can be simple (basic auth or Devise with admin flag).
